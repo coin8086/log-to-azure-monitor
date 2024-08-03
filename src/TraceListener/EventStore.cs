@@ -115,5 +115,4 @@ namespace RzWork.AzureMonitor
             GC.SuppressFinalize(this);
         }
     }
-
 }

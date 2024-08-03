@@ -41,21 +41,22 @@ namespace RzWork.AzureMonitor
 
         public static void WriteInfo<T>(string msg)
         {
-            Write(LogLevel.Info, typeof(T).FullName, msg);
+            Write<T>(LogLevel.Info, msg);
         }
 
         public static void WriteWarning<T>(string msg)
         {
-            Write(LogLevel.Warning, typeof(T).FullName, msg);
+            Write<T>(LogLevel.Warning, msg);
         }
 
         public static void WriteError<T>(string msg)
         {
-            Write(LogLevel.Error, typeof(T).FullName, msg);
+            Write<T>(LogLevel.Error, msg);
         }
 
-        private static void Write(LogLevel level, string category, string msg)
+        private static void Write<T>(LogLevel level, string msg)
         {
+            var category = typeof(T).FullName;
             if (EventLog.Exists(EtwSource))
             {
                 EventLog.WriteEntry(EtwSource, $"{category} {msg}", ToEventLogEntryType(level));
