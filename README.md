@@ -1,1 +1,1 @@
-# log-to-azure-monitor
+# Log to Azure Monitor
