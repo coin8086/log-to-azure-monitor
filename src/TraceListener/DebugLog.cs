@@ -64,7 +64,7 @@ namespace RzWork.AzureMonitor
         private static void Write<T>(LogLevel level, string msg)
         {
             var category = typeof(T).FullName;
-            if (EventLog.Exists(EtwSource))
+            if (EventLog.SourceExists(EtwSource))
             {
                 EventLog.WriteEntry(EtwSource, $"[{category}] {msg}", ToEventLogEntryType(level));
             }
