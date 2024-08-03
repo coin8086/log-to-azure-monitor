@@ -74,6 +74,7 @@ namespace RzWork.AzureMonitor
 
         public void Put(Event evt)
         {
+            //DebugLog.WriteInfo<EventStore>($"Put event: {evt}");
             _events.Add(evt);
         }
 

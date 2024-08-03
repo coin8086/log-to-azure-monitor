@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Text;
 
 namespace RzWork.AzureMonitor
 {
@@ -44,6 +45,20 @@ namespace RzWork.AzureMonitor
             Id = id;
             Source = source;
             Content = content;
+        }
+
+        public override string ToString()
+        {
+            var builder = new StringBuilder($"{typeof(Event)}:\n");
+            builder.Append($"  Time: \"{Time}\"\n");
+            builder.Append($"  ComputerName: \"{ComputerName}\"\n");
+            builder.Append($"  ProcessName: \"{ProcessName}\"\n");
+            builder.Append($"  ProcessId: \"{ProcessId}\"\n");
+            builder.Append($"  EventType: \"{EventType}\"\n");
+            builder.Append($"  Id: \"{Id}\"\n");
+            builder.Append($"  Source: \"{Source}\"\n");
+            builder.Append($"  Content: \"{Content}\"\n");
+            return builder.ToString();
         }
     }
 
