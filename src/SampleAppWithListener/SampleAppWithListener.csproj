@@ -3,6 +3,8 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net48</TargetFramework>
+    <!-- Do update the version for any changes in the app or its dependencies for better debug. -->
+    <Version>1.1.0</Version>
   </PropertyGroup>
 
   <ItemGroup>
