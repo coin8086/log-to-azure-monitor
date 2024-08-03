@@ -33,7 +33,7 @@ namespace RzWork.AzureMonitor
 
         static DebugLog()
         {
-            if (!EventLog.Exists(EtwSource))
+            if (!EventLog.SourceExists(EtwSource))
             {
                 try
                 {
