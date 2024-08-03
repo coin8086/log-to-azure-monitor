@@ -35,7 +35,14 @@ namespace RzWork.AzureMonitor
         {
             if (!EventLog.Exists(EtwSource))
             {
-                EventLog.CreateEventSource(EtwSource, EtwLog);
+                try
+                {
+                    EventLog.CreateEventSource(EtwSource, EtwLog);
+                }
+                catch (Exception ex)
+                {
+                    WriteConsole(LogLevel.Error, typeof(DebugLog).FullName, $"Error when creating Event Source: {ex}");
+                }
             }
         }
 
@@ -59,12 +66,17 @@ namespace RzWork.AzureMonitor
             var category = typeof(T).FullName;
             if (EventLog.Exists(EtwSource))
             {
-                EventLog.WriteEntry(EtwSource, $"{category} {msg}", ToEventLogEntryType(level));
+                EventLog.WriteEntry(EtwSource, $"[{category}] {msg}", ToEventLogEntryType(level));
             }
             else
             {
-                Console.Error.WriteLine($"{EtwLog} {DateTime.UtcNow:yyyy-MM-dd HH:mm:ss.fff} {level} {category} {msg}");
+                WriteConsole(level, category, msg);
             }
+        }
+
+        private static void WriteConsole(LogLevel level, string category, string msg)
+        {
+            Console.Error.WriteLine($"[{EtwLog}] [{DateTime.UtcNow:yyyy-MM-ddTHH:mm:ss.fffZ}] [{level}] [{category}] {msg}");
         }
     }
 }
