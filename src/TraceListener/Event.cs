@@ -20,21 +20,21 @@ namespace RzWork.AzureMonitor
             }
         }
 
-        public DateTime Time;
+        public DateTime Time { get; set; }
 
-        public string ComputerName = _ComputerName;
+        public string ComputerName { get; set; } = _ComputerName;
 
-        public string ProcessName = _ProcessName;
+        public string ProcessName { get; set; } = _ProcessName;
 
-        public int ProcessId = _ProcessId;
+        public int ProcessId { get; set; } = _ProcessId;
 
-        public TraceEventType Type;
+        public TraceEventType Type { get; set; }
 
-        public int Id;
+        public int Id { get; set; }
 
-        public string Source;
+        public string Source { get; set; }
 
-        public string Content;
+        public string Content { get; set; }
 
         public Event(DateTime time, TraceEventType type, int id, string source, string content)
         {
