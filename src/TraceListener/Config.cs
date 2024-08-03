@@ -9,11 +9,12 @@ namespace RzWork.AzureMonitor
 {
     internal class Config
     {
+        //NOTE: By default the JsonSerializer doesn't include fields. So we need properties for Tag.
         class Tag
         {
-            public string Name = null;
+            public string Name { get; set; }
 
-            public string Value = null;
+            public string Value { get; set; }
         }
 
         public const string MiClientIdKey = "MiClientId";
@@ -104,10 +105,10 @@ namespace RzWork.AzureMonitor
             {
                 return config;
             }
-            config.MiClientId = tags.FirstOrDefault(tag => tag.Name.Equals(EnvMiClientIdKey, StringComparison.OrdinalIgnoreCase)).Value;
-            config.DcrId = tags.FirstOrDefault(tag => tag.Name.Equals(EnvDcrIdKey, StringComparison.OrdinalIgnoreCase)).Value;
-            config.DcrStream = tags.FirstOrDefault(tag => tag.Name.Equals(EnvDcrStreamKey, StringComparison.OrdinalIgnoreCase)).Value;
-            config.DceUrl = tags.FirstOrDefault(tag => tag.Name.Equals(EnvDceUrlKey, StringComparison.OrdinalIgnoreCase)).Value;
+            config.MiClientId = tags.FirstOrDefault(tag => string.Equals(tag.Name, EnvMiClientIdKey, StringComparison.OrdinalIgnoreCase)).Value;
+            config.DcrId = tags.FirstOrDefault(tag => string.Equals(tag.Name, EnvDcrIdKey, StringComparison.OrdinalIgnoreCase)).Value;
+            config.DcrStream = tags.FirstOrDefault(tag => string.Equals(tag.Name, EnvDcrStreamKey, StringComparison.OrdinalIgnoreCase)).Value;
+            config.DceUrl = tags.FirstOrDefault(tag => string.Equals(tag.Name, EnvDceUrlKey, StringComparison.OrdinalIgnoreCase)).Value;
             return config;
         }
 
@@ -129,7 +130,7 @@ namespace RzWork.AzureMonitor
                         {
                             PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
                         };
-                        var tags = JsonSerializer.Deserialize<Tag[]>(content);
+                        var tags = JsonSerializer.Deserialize<Tag[]>(content, jsonOptions);
                         var config = FromTags(tags);
                         DebugLog.WriteInfo<Config>($"Config from IMDS: {config}");
                         return config;
