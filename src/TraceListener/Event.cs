@@ -29,7 +29,7 @@ namespace RzWork.AzureMonitor
         public int ProcessId { get; set; } = _ProcessId;
 
         //NOTE: Avoid the name "Type" since it's a reserved table column name in Azure Log Analytics.
-        public TraceEventType EventType { get; set; }
+        public string EventType { get; set; }
 
         public int Id { get; set; }
 
@@ -40,7 +40,7 @@ namespace RzWork.AzureMonitor
         public Event(DateTime time, TraceEventType type, int id, string source, string content)
         {
             Time = time;
-            EventType = type;
+            EventType = type.ToString();
             Id = id;
             Source = source;
             Content = content;
