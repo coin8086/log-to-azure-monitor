@@ -8,7 +8,7 @@ namespace RzWork.AzureMonitor
         enum LogLevel
         {
             Info,
-            Warning,
+            Warn,
             Error,
         }
 
@@ -17,7 +17,7 @@ namespace RzWork.AzureMonitor
             EventLogEntryType t = EventLogEntryType.Information;
             switch (level)
             {
-                case LogLevel.Warning:
+                case LogLevel.Warn:
                     t = EventLogEntryType.Warning;
                     break;
                 case LogLevel.Error:
@@ -29,7 +29,7 @@ namespace RzWork.AzureMonitor
 
         private static string EtwSource = typeof(DebugLog).Namespace;
 
-        private static string EtwLog = typeof(DebugLog).FullName;
+        private static string EtwLog = typeof(DebugLog).Name;
 
         static DebugLog()
         {
@@ -53,7 +53,7 @@ namespace RzWork.AzureMonitor
 
         public static void WriteWarning<T>(string msg)
         {
-            Write<T>(LogLevel.Warning, msg);
+            Write<T>(LogLevel.Warn, msg);
         }
 
         public static void WriteError<T>(string msg)

@@ -68,10 +68,10 @@ namespace RzWork.AzureMonitor
         public override string ToString()
         {
             var builder = new StringBuilder($"{typeof(Config)}:\n");
-            builder.Append($"  MiClientId: \"{MiClientId}\"");
-            builder.Append($"  DcrId: \"{DcrId}\"");
-            builder.Append($"  DcrStream: \"{DcrStream}\"");
-            builder.Append($"  DceUrl: \"{DceUrl}\"");
+            builder.Append($"  MiClientId: \"{MiClientId}\"\n");
+            builder.Append($"  DcrId: \"{DcrId}\"\n");
+            builder.Append($"  DcrStream: \"{DcrStream}\"\n");
+            builder.Append($"  DceUrl: \"{DceUrl}\"\n");
             return builder.ToString();
         }
 
