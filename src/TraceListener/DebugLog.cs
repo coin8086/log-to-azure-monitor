@@ -30,7 +30,7 @@ namespace RzWork.AzureMonitor
 
         private static string _EtwSource = typeof(DebugLog).Namespace;
 
-        private static string _EtwLog = typeof(DebugLog).Name;
+        private static string _EtwLog = typeof(DebugLog).FullName;
 
         private static bool _Verbose = false;
 
@@ -100,7 +100,7 @@ namespace RzWork.AzureMonitor
 
         private static void WriteConsole(LogLevel level, string category, string msg)
         {
-            Console.Error.WriteLine($"[{_EtwLog}] [{DateTime.UtcNow:yyyy-MM-ddTHH:mm:ss.fffZ}] [{level}] [{_ProcessName}] [{_ProcessId}] [{category}] {msg}");
+            Console.Error.WriteLine($"[{DateTime.UtcNow:yyyy-MM-ddTHH:mm:ss.fffZ}] [{level}] [{_ProcessName}] [{_ProcessId}] [{category}] {msg}");
         }
     }
 }
