@@ -73,8 +73,17 @@ namespace RzWork.AzureMonitor
             {
                 _Out.Close();
             }
-            _Out = new StreamWriter(file);
-            _OutToFile = true;
+            try
+            {
+                _Out = new StreamWriter(file);
+                _OutToFile = true;
+            }
+            catch (Exception ex)
+            {
+                _Out = Console.Error;
+                _OutToFile = false;
+                WriteConsole(LogLevel.Warn, typeof(DebugLog).FullName, $"Error when creating file stream: {ex}");
+            }
         }
 
         public static void WriteVerbose<T>(string format, params object[] objects)
