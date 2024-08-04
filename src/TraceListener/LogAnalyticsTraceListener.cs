@@ -53,6 +53,19 @@ namespace RzWork.AzureMonitor
                             var client = new LogsIngestionClient(new Uri(config.DceUrl), credential, clientOpts);
                             _store = new EventStore(client, config.DcrId, config.DcrStream);
                             _initialzed = true;
+
+                            try
+                            {
+                                AppDomain.CurrentDomain.ProcessExit += (sender, args) =>
+                                {
+                                    Close();
+                                };
+                            }
+                            catch (Exception ex)
+                            {
+                                DebugLog.WriteError<LogAnalyticsTraceListener>($"Error when registering ProcessExit event: {ex}");
+                            }
+
                             DebugLog.WriteInfo<LogAnalyticsTraceListener>($"Init finished.");
                         }
                         catch (Exception ex)
