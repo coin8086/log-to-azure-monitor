@@ -16,7 +16,7 @@ namespace RzWork.AzureMonitor
 
         private BlockingCollection<Event> _events = new BlockingCollection<Event>();
 
-        private static int _checkDelay = 500; //In MS
+        private static int _checkDelay = 1000; //In MS
 
         private bool _disposed = false;
 
