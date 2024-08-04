@@ -34,6 +34,10 @@ namespace RzWork.AzureMonitor
 
         private static bool _Verbose = false;
 
+        private static string _ProcessName = null;
+
+        private static int _ProcessId = 0;
+
         static DebugLog()
         {
             if (!EventLog.SourceExists(_EtwSource))
@@ -47,8 +51,15 @@ namespace RzWork.AzureMonitor
                     WriteConsole(LogLevel.Error, typeof(DebugLog).FullName, $"Error when creating Event Source: {ex}");
                 }
             }
+
             var verbValue = Environment.GetEnvironmentVariable("DebugLog_Verbose");
             bool.TryParse(verbValue, out _Verbose);
+
+            using (var currentProcess = Process.GetCurrentProcess())
+            {
+                _ProcessName = currentProcess.ProcessName;
+                _ProcessId = currentProcess.Id;
+            }
         }
 
         public static void WriteVerbose<T>(string format, params object[] objects)
@@ -79,7 +90,7 @@ namespace RzWork.AzureMonitor
             var category = typeof(T).FullName;
             if (EventLog.SourceExists(_EtwSource))
             {
-                EventLog.WriteEntry(_EtwSource, $"[{category}] {msg}", ToEventLogEntryType(level));
+                EventLog.WriteEntry(_EtwSource, $"[{_ProcessName}] [{_ProcessId}] [{category}] {msg}", ToEventLogEntryType(level));
             }
             else
             {
@@ -89,7 +100,7 @@ namespace RzWork.AzureMonitor
 
         private static void WriteConsole(LogLevel level, string category, string msg)
         {
-            Console.Error.WriteLine($"[{_EtwLog}] [{DateTime.UtcNow:yyyy-MM-ddTHH:mm:ss.fffZ}] [{level}] [{category}] {msg}");
+            Console.Error.WriteLine($"[{_EtwLog}] [{DateTime.UtcNow:yyyy-MM-ddTHH:mm:ss.fffZ}] [{level}] [{_ProcessName}] [{_ProcessId}] [{category}] {msg}");
         }
     }
 }
