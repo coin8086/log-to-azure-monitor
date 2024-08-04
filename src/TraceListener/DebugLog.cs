@@ -7,6 +7,7 @@ namespace RzWork.AzureMonitor
     {
         enum LogLevel
         {
+            Verb,
             Info,
             Warn,
             Error,
@@ -31,6 +32,8 @@ namespace RzWork.AzureMonitor
 
         private static string EtwLog = typeof(DebugLog).Name;
 
+        private static bool Verbose = false;
+
         static DebugLog()
         {
             if (!EventLog.SourceExists(EtwSource))
@@ -43,6 +46,16 @@ namespace RzWork.AzureMonitor
                 {
                     WriteConsole(LogLevel.Error, typeof(DebugLog).FullName, $"Error when creating Event Source: {ex}");
                 }
+            }
+            var verbValue = Environment.GetEnvironmentVariable("DebugLog_Verbose");
+            bool.TryParse(verbValue, out Verbose);
+        }
+
+        public static void WriteVerbose<T>(string format, params object[] objects)
+        {
+            if (Verbose)
+            {
+                Write<T>(LogLevel.Verb, string.Format(format, objects));
             }
         }
 
