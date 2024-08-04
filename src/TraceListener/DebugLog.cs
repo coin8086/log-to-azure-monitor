@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.IO;
 
 namespace RzWork.AzureMonitor
 {
@@ -38,6 +39,10 @@ namespace RzWork.AzureMonitor
 
         private static int _ProcessId = 0;
 
+        private static TextWriter _Out = Console.Error;
+
+        private static bool _OutToFile = false;
+
         static DebugLog()
         {
             if (!EventLog.SourceExists(_EtwSource))
@@ -60,6 +65,16 @@ namespace RzWork.AzureMonitor
                 _ProcessName = currentProcess.ProcessName;
                 _ProcessId = currentProcess.Id;
             }
+        }
+
+        public static void SetLogFile(string file)
+        {
+            if (_OutToFile)
+            {
+                _Out.Close();
+            }
+            _Out = new StreamWriter(file);
+            _OutToFile = true;
         }
 
         public static void WriteVerbose<T>(string format, params object[] objects)
@@ -88,19 +103,17 @@ namespace RzWork.AzureMonitor
         private static void Write<T>(LogLevel level, string msg)
         {
             var category = typeof(T).FullName;
+            WriteConsole(level, category, msg);
             if (EventLog.SourceExists(_EtwSource))
             {
                 EventLog.WriteEntry(_EtwSource, $"[{_ProcessName}] [{_ProcessId}] [{category}] {msg}", ToEventLogEntryType(level));
-            }
-            else
-            {
-                WriteConsole(level, category, msg);
             }
         }
 
         private static void WriteConsole(LogLevel level, string category, string msg)
         {
-            Console.Error.WriteLine($"[{DateTime.UtcNow:yyyy-MM-ddTHH:mm:ss.fffZ}] [{level}] [{_ProcessName}] [{_ProcessId}] [{category}] {msg}");
+            _Out.WriteLine($"[{DateTime.UtcNow:yyyy-MM-ddTHH:mm:ss.fffZ}] [{level}] [{_ProcessName}] [{_ProcessId}] [{category}] {msg}");
+            _Out.Flush();
         }
     }
 }

@@ -18,9 +18,13 @@ namespace RzWork.AzureMonitor
 
         private bool _shouldInit = true;
 
-        public LogAnalyticsTraceListener()
+        public LogAnalyticsTraceListener(string logFile)
         {
             //TODO: If not on Azure, then _shouldInit = false
+            if (!string.IsNullOrWhiteSpace(logFile))
+            {
+                DebugLog.SetLogFile(logFile);
+            }
         }
 
         private bool Init()
