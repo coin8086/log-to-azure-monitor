@@ -45,18 +45,6 @@ namespace RzWork.AzureMonitor
 
         static DebugLog()
         {
-            if (!EventLog.SourceExists(_EtwSource))
-            {
-                try
-                {
-                    EventLog.CreateEventSource(_EtwSource, _EtwLog);
-                }
-                catch (Exception ex)
-                {
-                    WriteConsole(LogLevel.Error, typeof(DebugLog).FullName, $"Error when creating Event Source: {ex}");
-                }
-            }
-
             var verbValue = Environment.GetEnvironmentVariable("DebugLog_Verbose");
             bool.TryParse(verbValue, out _Verbose);
 
@@ -64,6 +52,18 @@ namespace RzWork.AzureMonitor
             {
                 _ProcessName = currentProcess.ProcessName;
                 _ProcessId = currentProcess.Id;
+            }
+
+            try
+            {
+                if (!EventLog.SourceExists(_EtwSource))
+                {
+                    EventLog.CreateEventSource(_EtwSource, _EtwLog);
+                }
+            }
+            catch (Exception ex)
+            {
+                WriteConsole(LogLevel.Warn, typeof(DebugLog).FullName, $"Error when accessing ETW: {ex}");
             }
         }
 
@@ -104,10 +104,14 @@ namespace RzWork.AzureMonitor
         {
             var category = typeof(T).FullName;
             WriteConsole(level, category, msg);
-            if (EventLog.SourceExists(_EtwSource))
+            try
             {
-                EventLog.WriteEntry(_EtwSource, $"[{_ProcessName}] [{_ProcessId}] [{category}] {msg}", ToEventLogEntryType(level));
+                if (EventLog.SourceExists(_EtwSource))
+                {
+                    EventLog.WriteEntry(_EtwSource, $"[{_ProcessName}] [{_ProcessId}] [{category}] {msg}", ToEventLogEntryType(level));
+                }
             }
+            catch (Exception) {}
         }
 
         private static void WriteConsole(LogLevel level, string category, string msg)
