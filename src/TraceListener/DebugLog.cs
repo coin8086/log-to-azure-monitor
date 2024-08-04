@@ -28,19 +28,19 @@ namespace RzWork.AzureMonitor
             return t;
         }
 
-        private static string EtwSource = typeof(DebugLog).Namespace;
+        private static string _EtwSource = typeof(DebugLog).Namespace;
 
-        private static string EtwLog = typeof(DebugLog).Name;
+        private static string _EtwLog = typeof(DebugLog).Name;
 
-        private static bool Verbose = false;
+        private static bool _Verbose = false;
 
         static DebugLog()
         {
-            if (!EventLog.SourceExists(EtwSource))
+            if (!EventLog.SourceExists(_EtwSource))
             {
                 try
                 {
-                    EventLog.CreateEventSource(EtwSource, EtwLog);
+                    EventLog.CreateEventSource(_EtwSource, _EtwLog);
                 }
                 catch (Exception ex)
                 {
@@ -48,12 +48,12 @@ namespace RzWork.AzureMonitor
                 }
             }
             var verbValue = Environment.GetEnvironmentVariable("DebugLog_Verbose");
-            bool.TryParse(verbValue, out Verbose);
+            bool.TryParse(verbValue, out _Verbose);
         }
 
         public static void WriteVerbose<T>(string format, params object[] objects)
         {
-            if (Verbose)
+            if (_Verbose)
             {
                 Write<T>(LogLevel.Verb, string.Format(format, objects));
             }
@@ -77,9 +77,9 @@ namespace RzWork.AzureMonitor
         private static void Write<T>(LogLevel level, string msg)
         {
             var category = typeof(T).FullName;
-            if (EventLog.SourceExists(EtwSource))
+            if (EventLog.SourceExists(_EtwSource))
             {
-                EventLog.WriteEntry(EtwSource, $"[{category}] {msg}", ToEventLogEntryType(level));
+                EventLog.WriteEntry(_EtwSource, $"[{category}] {msg}", ToEventLogEntryType(level));
             }
             else
             {
@@ -89,7 +89,7 @@ namespace RzWork.AzureMonitor
 
         private static void WriteConsole(LogLevel level, string category, string msg)
         {
-            Console.Error.WriteLine($"[{EtwLog}] [{DateTime.UtcNow:yyyy-MM-ddTHH:mm:ss.fffZ}] [{level}] [{category}] {msg}");
+            Console.Error.WriteLine($"[{_EtwLog}] [{DateTime.UtcNow:yyyy-MM-ddTHH:mm:ss.fffZ}] [{level}] [{category}] {msg}");
         }
     }
 }
