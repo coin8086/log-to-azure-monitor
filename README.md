@@ -1,1 +1,3 @@
 # Log to Azure Monitor
+
+The project shows how to make log to Azure Monitor in its [Logs Ingestion API](https://learn.microsoft.com/en-us/azure/azure-monitor/logs/logs-ingestion-api-overview). It provides a [Trace Listener](src/TraceListener/) for the logging and [a sample app](src/SampleAppWithListener/) showing the usage of the listener. It also has [Bicep scripts](src/SetupOnAzure/) for setting up all necessary Azure resources.

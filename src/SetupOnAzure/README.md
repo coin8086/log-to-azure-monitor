@@ -1,6 +1,6 @@
 # Setup Sample on Azure
 
-The [sample.bicep](sample.bicep) setups a sample cluster of VMs with the [SampleAppWithListener](../SampleAppWithListener/) to show the usage of [LogAnalyticsTraceListener](../TraceListener/), which logs to Azure Monitor in its log ingestion API. It makes use of the (reusable) module [log-ingestion.bicep](log-ingestion.bicep) to create required Azure resources.
+The [sample.bicep](sample.bicep) setups a sample cluster of VMs with the [SampleAppWithListener](../SampleAppWithListener/) to show the usage of [LogAnalyticsTraceListener](../TraceListener/), which logs to Azure Monitor in its [Logs Ingestion API](https://learn.microsoft.com/en-us/azure/azure-monitor/logs/logs-ingestion-api-overview). It makes use of the (reusable) module [log-ingestion.bicep](log-ingestion.bicep) to create required Azure resources.
 
 Generally, you need the following things to use the Azure Monitor log ingestion API:
 
