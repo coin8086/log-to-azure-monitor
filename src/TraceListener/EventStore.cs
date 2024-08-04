@@ -45,6 +45,7 @@ namespace RzWork.AzureMonitor
             var count = PopulateBuf(batchBuf, batchSize);
             if (count > 0)
             {
+                DebugLog.WriteVerbose<EventStore>("{0} events to send.", count);
                 var logs = new ArraySegment<Event>(batchBuf, 0, count);
                 try
                 {
@@ -55,6 +56,10 @@ namespace RzWork.AzureMonitor
                     DebugLog.WriteError<EventStore>($"Error on uploading logs: {ex}");
                     return 0;
                 }
+            }
+            else
+            {
+                DebugLog.WriteVerbose<EventStore>("No event to send!");
             }
             return count;
         }
