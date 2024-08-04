@@ -4,6 +4,7 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <RootNamespace>RzWork.AzureMonitor</RootNamespace>
     <AssemblyName>RzWork.AzureMonitor.TraceListener</AssemblyName>
+    <Version>1.1.2</Version>
   </PropertyGroup>
 
   <ItemGroup>
