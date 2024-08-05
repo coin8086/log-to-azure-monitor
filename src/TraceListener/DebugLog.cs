@@ -65,6 +65,11 @@ namespace RzWork.AzureMonitor
             {
                 WriteConsole(LogLevel.Warn, typeof(DebugLog).FullName, $"Error when accessing ETW: {ex}");
             }
+
+            AppDomain.CurrentDomain.ProcessExit += (sender, args) =>
+            {
+                Close();
+            };
         }
 
         public static void SetLogFile(string file)
@@ -75,7 +80,8 @@ namespace RzWork.AzureMonitor
             }
             try
             {
-                _Out = new StreamWriter(file);
+                //NOTE: The file will be recreated
+                _Out = TextWriter.Synchronized(new StreamWriter(file, true));
                 _OutToFile = true;
             }
             catch (Exception ex)
@@ -109,6 +115,14 @@ namespace RzWork.AzureMonitor
             Write<T>(LogLevel.Error, msg);
         }
 
+        public static void Close()
+        {
+            if (_OutToFile)
+            {
+                _Out.Close();
+            }
+        }
+
         private static void Write<T>(LogLevel level, string msg)
         {
             var category = typeof(T).FullName;
@@ -125,8 +139,12 @@ namespace RzWork.AzureMonitor
 
         private static void WriteConsole(LogLevel level, string category, string msg)
         {
-            _Out.WriteLine($"[{DateTime.UtcNow:yyyy-MM-ddTHH:mm:ss.fffZ}] [{level}] [{_ProcessName}] [{_ProcessId}] [{category}] {msg}");
-            _Out.Flush();
+            try
+            {
+                _Out.WriteLine($"[{DateTime.UtcNow:yyyy-MM-ddTHH:mm:ss.fffZ}] [{level}] [{_ProcessName}] [{_ProcessId}] [{category}] {msg}");
+                _Out.Flush();
+            }
+            catch (Exception) { }
         }
     }
 }
