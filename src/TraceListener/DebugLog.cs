@@ -65,11 +65,6 @@ namespace RzWork.AzureMonitor
             {
                 WriteConsole(LogLevel.Warn, typeof(DebugLog).FullName, $"Error when accessing ETW: {ex}");
             }
-
-            AppDomain.CurrentDomain.ProcessExit += (sender, args) =>
-            {
-                Close();
-            };
         }
 
         public static void SetLogFile(string file)

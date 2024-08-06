@@ -44,12 +44,14 @@ namespace RzWork.AzureMonitor
                     {
                         var config = Config.Get(Attributes);
                         DebugLog.WriteInfo<LogAnalyticsTraceListener>($"Got config: {config}");
+
                         if (!config.Complete)
                         {
                             DebugLog.WriteWarning<LogAnalyticsTraceListener>("Incomplete config. Abort Init.");
                             _shouldInit = false;
                             return false;
                         }
+
                         try
                         {
                             var credential = new ManagedIdentityCredential(config.MiClientId);
@@ -65,7 +67,9 @@ namespace RzWork.AzureMonitor
                             {
                                 AppDomain.CurrentDomain.ProcessExit += (sender, args) =>
                                 {
+                                    DebugLog.WriteInfo<LogAnalyticsTraceListener>("Process existing...");
                                     Close();
+                                    DebugLog.Close();
                                 };
                             }
                             catch (Exception ex)
