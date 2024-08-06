@@ -11,11 +11,12 @@ namespace SampleAppWithListener
         {
             var cts = new CancellationTokenSource();
             var token = cts.Token;
-            var end = new ManualResetEvent(false);
 
             Console.CancelKeyPress += (sender, evt) => {
+                //NOTE: Do not exit process in this callback, or the TraceListeners' Close() method
+                //won't get called.
+                evt.Cancel = true;
                 cts.Cancel();
-                end.WaitOne();
             };
 
             Console.WriteLine("Main starts.");
@@ -35,7 +36,6 @@ namespace SampleAppWithListener
             }
 
             Console.WriteLine("Main ends.");
-            end.Set();
         }
     }
 }

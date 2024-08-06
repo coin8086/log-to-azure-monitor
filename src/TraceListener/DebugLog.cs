@@ -75,7 +75,6 @@ namespace RzWork.AzureMonitor
             }
             try
             {
-                //NOTE: The file will be recreated
                 _Out = TextWriter.Synchronized(new StreamWriter(file, true));
                 _OutToFile = true;
             }
