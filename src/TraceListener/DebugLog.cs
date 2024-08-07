@@ -115,14 +115,6 @@ namespace RzWork.AzureMonitor
             Write<T>(LogLevel.Error, msg);
         }
 
-        public static void Close()
-        {
-            if (_OutToFile)
-            {
-                _Out.Close();
-            }
-        }
-
         private static void Write<T>(LogLevel level, string msg)
         {
             var category = typeof(T).FullName;

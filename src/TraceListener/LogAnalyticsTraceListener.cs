@@ -62,7 +62,6 @@ namespace RzWork.AzureMonitor
                                 {
                                     DebugLog.WriteInfo<LogAnalyticsTraceListener>("Process existing...");
                                     Close();
-                                    DebugLog.Close();
                                 };
                             }
                             catch (Exception ex)
