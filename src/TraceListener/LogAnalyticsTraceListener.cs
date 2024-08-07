@@ -63,10 +63,16 @@ namespace RzWork.AzureMonitor
                                     DebugLog.WriteInfo<LogAnalyticsTraceListener>("Process existing...");
                                     Close();
                                 };
+
+                                AppDomain.CurrentDomain.UnhandledException += (sender, args) =>
+                                {
+                                    DebugLog.WriteError<LogAnalyticsTraceListener>($"Caught unhandled exception: {args.ExceptionObject}");
+                                    Close();
+                                };
                             }
                             catch (Exception ex)
                             {
-                                DebugLog.WriteError<LogAnalyticsTraceListener>($"Error when registering ProcessExit event: {ex}");
+                                DebugLog.WriteError<LogAnalyticsTraceListener>($"Error when registering AppDomain event: {ex}");
                             }
 
                             DebugLog.WriteInfo<LogAnalyticsTraceListener>($"Init finished.");
