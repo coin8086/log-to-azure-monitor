@@ -45,13 +45,19 @@ namespace RzWork.AzureMonitor
 
         static DebugLog()
         {
-            var verbValue = Environment.GetEnvironmentVariable("DebugLog_Verbose");
-            bool.TryParse(verbValue, out _Verbose);
-
             using (var currentProcess = Process.GetCurrentProcess())
             {
                 _ProcessName = currentProcess.ProcessName;
                 _ProcessId = currentProcess.Id;
+            }
+
+            var verbValue = Environment.GetEnvironmentVariable("DebugLog_Verbose");
+            bool.TryParse(verbValue, out _Verbose);
+
+            var outFile = Environment.GetEnvironmentVariable("DebugLog_OutFile");
+            if (!string.IsNullOrEmpty(outFile))
+            {
+                SetLogFile(outFile);
             }
 
             try
@@ -67,7 +73,7 @@ namespace RzWork.AzureMonitor
             }
         }
 
-        public static void SetLogFile(string file)
+        private static void SetLogFile(string file)
         {
             if (_OutToFile)
             {
@@ -82,7 +88,7 @@ namespace RzWork.AzureMonitor
             {
                 _Out = Console.Error;
                 _OutToFile = false;
-                WriteConsole(LogLevel.Warn, typeof(DebugLog).FullName, $"Error when creating file stream: {ex}");
+                WriteConsole(LogLevel.Warn, typeof(DebugLog).FullName, $"Error when setting log file: {ex}");
             }
         }
 
