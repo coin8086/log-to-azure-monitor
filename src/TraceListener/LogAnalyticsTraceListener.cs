@@ -58,17 +58,21 @@ namespace RzWork.AzureMonitor
 
                             try
                             {
+                                var source = typeof(LogAnalyticsTraceListener).FullName;
+
                                 AppDomain.CurrentDomain.ProcessExit += (sender, args) =>
                                 {
-                                    DebugLog.WriteInfo<LogAnalyticsTraceListener>("Process existing...");
-                                    //TODO: Trace the event before closing?
+                                    var msg = "Process is exiting.";
+                                    DebugLog.WriteInfo<LogAnalyticsTraceListener>(msg);
+                                    TraceEvent(new TraceEventCache(), source, TraceEventType.Information, 0, msg);
                                     Close();
                                 };
 
                                 AppDomain.CurrentDomain.UnhandledException += (sender, args) =>
                                 {
-                                    DebugLog.WriteError<LogAnalyticsTraceListener>($"Caught unhandled exception: {args.ExceptionObject}");
-                                    //TODO: Trace the error event before closing?
+                                    var msg = $"Caught unhandled exception: {args.ExceptionObject}";
+                                    DebugLog.WriteError<LogAnalyticsTraceListener>(msg);
+                                    TraceEvent(new TraceEventCache(), source, TraceEventType.Warning, 0, msg);
                                     Close();
                                 };
                             }
