@@ -7,7 +7,7 @@ using System.Text.Json;
 
 namespace RzWork.AzureMonitor
 {
-    internal class Config
+    public class Config
     {
         //NOTE: By default the JsonSerializer doesn't include fields. So we need properties for Tag.
         class Tag
