@@ -61,12 +61,14 @@ namespace RzWork.AzureMonitor
                                 AppDomain.CurrentDomain.ProcessExit += (sender, args) =>
                                 {
                                     DebugLog.WriteInfo<LogAnalyticsTraceListener>("Process existing...");
+                                    //TODO: Trace the event before closing?
                                     Close();
                                 };
 
                                 AppDomain.CurrentDomain.UnhandledException += (sender, args) =>
                                 {
                                     DebugLog.WriteError<LogAnalyticsTraceListener>($"Caught unhandled exception: {args.ExceptionObject}");
+                                    //TODO: Trace the error event before closing?
                                     Close();
                                 };
                             }
@@ -145,6 +147,10 @@ namespace RzWork.AzureMonitor
                 }
             }
             _store.Put(new Event(eventCache.DateTime, eventType, id, source, message));
+            if (eventType <= TraceEventType.Warning)
+            {
+                _store.Flush(false);
+            }
         }
 
         public override void TraceData(TraceEventCache eventCache, string source, TraceEventType eventType, int id, object data)
@@ -170,7 +176,7 @@ namespace RzWork.AzureMonitor
             {
                 return;
             }
-            _store.Flush();
+            _store.Flush(false);
         }
 
         public override void Close()
