@@ -73,7 +73,7 @@ namespace RzWork.AzureMonitor
             }
         }
 
-        private static void SetLogFile(string file)
+        private static void SetLogFile(string filename)
         {
             if (_OutToFile)
             {
@@ -81,14 +81,15 @@ namespace RzWork.AzureMonitor
             }
             try
             {
-                _Out = TextWriter.Synchronized(new StreamWriter(file, true));
+                var fullname = $"{filename}_{_ProcessId}.txt";
+                _Out = TextWriter.Synchronized(new StreamWriter(fullname, true));
                 _OutToFile = true;
             }
             catch (Exception ex)
             {
                 _Out = Console.Error;
                 _OutToFile = false;
-                WriteConsole(LogLevel.Warn, typeof(DebugLog).FullName, $"Error when setting log file: {ex}");
+                WriteConsole(LogLevel.Warn, typeof(DebugLog).FullName, $"Error when setting log filename: {ex}");
             }
         }
 
