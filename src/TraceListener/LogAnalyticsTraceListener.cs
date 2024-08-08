@@ -53,14 +53,15 @@ namespace RzWork.AzureMonitor
                             clientOpts.Retry.Mode = RetryMode.Exponential;
                             clientOpts.Retry.Delay = TimeSpan.FromSeconds(2);
                             var client = new LogsIngestionClient(new Uri(config.DceUrl), credential, clientOpts);
-                            _store = new EventStore(client, config.DcrId, config.DcrStream);
+                            var sender = new LogAnalyticsSender(client, config.DcrId, config.DcrStream);
+                            _store = new EventStore(sender);
                             _initialzed = true;
 
                             try
                             {
                                 var source = typeof(LogAnalyticsTraceListener).FullName;
 
-                                AppDomain.CurrentDomain.ProcessExit += (sender, args) =>
+                                AppDomain.CurrentDomain.ProcessExit += (_, args) =>
                                 {
                                     var msg = "Process is exiting.";
                                     DebugLog.WriteInfo<LogAnalyticsTraceListener>(msg);
@@ -68,7 +69,7 @@ namespace RzWork.AzureMonitor
                                     Close();
                                 };
 
-                                AppDomain.CurrentDomain.UnhandledException += (sender, args) =>
+                                AppDomain.CurrentDomain.UnhandledException += (_, args) =>
                                 {
                                     var msg = $"Caught unhandled exception: {args.ExceptionObject}";
                                     DebugLog.WriteError<LogAnalyticsTraceListener>(msg);

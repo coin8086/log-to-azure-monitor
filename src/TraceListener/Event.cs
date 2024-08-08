@@ -4,7 +4,7 @@ using System.Text;
 
 namespace RzWork.AzureMonitor
 {
-    internal class Event
+    public class Event
     {
         private static string _ComputerName = Environment.MachineName;
 
