@@ -71,13 +71,13 @@ namespace RzWork.AzureMonitor
                 }
                 catch (Exception ex)
                 {
-                    DebugLog.WriteError<EventStore>($"Error on uploading logs: {ex}");
+                    DebugLog.WriteError<EventStore>($"Error on sending events: {ex}");
                     return 0;
                 }
             }
             else
             {
-                DebugLog.WriteVerbose<EventStore>("No event to send.");
+                DebugLog.WriteVerbose<EventStore>("No more event to send.");
             }
             return count;
         }
@@ -111,7 +111,7 @@ namespace RzWork.AzureMonitor
         //NOTE: Client should not keep writing trace log while Flushing, or the Flush may never end.
         public void Flush(bool synchronized)
         {
-            DebugLog.WriteInfo<EventStore>($"Events to flush: {_events.Count}");
+            DebugLog.WriteInfo<EventStore>($"{_events.Count} events to flush.");
             if (synchronized)
             {
                 var batchSize = 100;
