@@ -152,10 +152,6 @@ namespace RzWork.AzureMonitor
                 }
             }
             _store.Put(new Event(eventCache.DateTime, eventType, id, source, message));
-            if (eventType <= TraceEventType.Warning)
-            {
-                _store.Flush(false);
-            }
         }
 
         public override void TraceData(TraceEventCache eventCache, string source, TraceEventType eventType, int id, object data)

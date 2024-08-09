@@ -105,12 +105,22 @@ namespace RzWork.AzureMonitor
                 DebugLog.WriteWarning<EventStore>("Event is put after Close is called!");
                 return;
             }
+
             _events.Add(evt);
-            var count = _events.Count;
-            if (count >= _flushThreshold)
+
+            if (evt.EventType <= TraceEventType.Warning)
             {
-                DebugLog.WriteVerbose<EventStore>("Trigger a flush by {0} events", count);
+                DebugLog.WriteVerbose<EventStore>("Trigger a flush by a(n) {0} event.", evt.EventType);
                 Flush(false);
+            }
+            else
+            {
+                var count = _events.Count;
+                if (count >= _flushThreshold)
+                {
+                    DebugLog.WriteVerbose<EventStore>("Trigger a flush by {0} events", count);
+                    Flush(false);
+                }
             }
         }
 

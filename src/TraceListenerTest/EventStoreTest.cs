@@ -57,21 +57,18 @@ public class EventStoreTest : IDisposable
         Assert.Equal(FlushThreshold, _sender.Count);
     }
 
-    //public async Task LogsAreSentOnImportantEvent()
-    //{
-    //    var count = FlushThreshold / 2;
-    //    for (var i = 0; i < count; i++)
-    //    {
-    //        _eventStore.Put(_evt);
-    //    }
-    //    Assert.Equal(0, _sender.Count);
+    [Fact]
+    public async Task LogsAreSentOnImportantEvent()
+    {
+        _eventStore.Put(_evt);
+        Assert.Equal(0, _sender.Count);
 
-    //    var warning = new Event(DateTime.UtcNow, TraceEventType.Warning, 0, "", "Some warning");
-    //    _eventStore.Put(warning);
+        var error = new Event(DateTime.UtcNow, TraceEventType.Error, 0, "", "Some error");
+        _eventStore.Put(error);
 
-    //    await Task.Delay(FlushInterval / 2);
-    //    Assert.Equal(count + 1, _sender.Count);
-    //}
+        await Task.Delay(FlushInterval / 2);
+        Assert.Equal(2, _sender.Count);
+    }
 
     [Fact]
     public void SynchronousFlush()
