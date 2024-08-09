@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace RzWork.AzureMonitor
 {
@@ -30,7 +32,8 @@ namespace RzWork.AzureMonitor
         public int ProcessId { get; set; } = _ProcessId;
 
         //NOTE: Avoid the name "Type" since it's a reserved table column name in Azure Log Analytics.
-        public string EventType { get; set; }
+        [JsonConverter(typeof(JsonStringEnumConverter))]
+        public TraceEventType EventType { get; set; }
 
         public int Id { get; set; }
 
@@ -41,25 +44,16 @@ namespace RzWork.AzureMonitor
         public Event(DateTime time, TraceEventType type, int id, string source, string content)
         {
             Time = time;
-            EventType = type.ToString();
+            EventType = type;
             Id = id;
             Source = source;
             Content = content;
         }
 
-        public override string ToString()
+        //For debug purpose
+        public string ToJson()
         {
-            var builder = new StringBuilder($"{typeof(Event)}:\n");
-            builder.Append($"  Time: \"{Time}\"\n");
-            builder.Append($"  ComputerName: \"{ComputerName}\"\n");
-            builder.Append($"  ProcessName: \"{ProcessName}\"\n");
-            builder.Append($"  ProcessId: \"{ProcessId}\"\n");
-            builder.Append($"  EventType: \"{EventType}\"\n");
-            builder.Append($"  Id: \"{Id}\"\n");
-            builder.Append($"  Source: \"{Source}\"\n");
-            builder.Append($"  Content: \"{Content}\"\n");
-            return builder.ToString();
+            return JsonSerializer.Serialize(this);
         }
     }
-
 }
