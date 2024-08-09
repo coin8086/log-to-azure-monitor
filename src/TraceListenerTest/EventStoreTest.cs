@@ -71,6 +71,26 @@ public class EventStoreTest : IDisposable
     }
 
     [Fact]
+    public async Task MultipleConcurrentPuts()
+    {
+        const int n = 10;
+        const int m = FlushThreshold * 10;
+        var tasks = new Task[n];
+        for (var i = 0; i < n; i++)
+        {
+            tasks[i] = Task.Run(() => {
+                for (var j = 0; j < m; j++)
+                {
+                    _eventStore.Put(_evt);
+                }
+            });
+        }
+        await Task.WhenAll(tasks);
+        _eventStore.Flush(true);
+        Assert.Equal(n * m, _sender.Count);
+    }
+
+    [Fact]
     public void SynchronousFlush()
     {
         var count = FlushThreshold / 2;
