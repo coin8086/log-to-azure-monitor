@@ -27,6 +27,12 @@ public class EventStoreTest : IDisposable
         _eventStore.Dispose();
     }
 
+    [Fact]
+    public void NullParams()
+    {
+        _eventStore.Put(null);
+        _eventStore.Flush(true);
+    }
 
     [Fact]
     public async Task LogsAreSentPeriodically()

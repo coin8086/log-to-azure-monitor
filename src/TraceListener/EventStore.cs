@@ -32,6 +32,10 @@ namespace RzWork.AzureMonitor
 
         public EventStore(ILogSender sender, int? flushInterval = null, int? flushThreshold = null)
         {
+            if (sender == null)
+            {
+                throw new ArgumentNullException(nameof(sender));
+            }
             _sender = sender;
             _flushInterval = flushInterval ?? FlushInterval;
             _flushThreshold = flushThreshold ?? FlushThreshold;
@@ -99,6 +103,11 @@ namespace RzWork.AzureMonitor
 
         public void Put(Event evt)
         {
+            if (evt == null)
+            {
+                return;
+            }
+
             DebugLog.WriteVerbose<EventStore>("Put event: {0}", evt.ToJson());
             if (_events.IsAddingCompleted)
             {

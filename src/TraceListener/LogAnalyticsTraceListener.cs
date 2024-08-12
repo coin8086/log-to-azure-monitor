@@ -151,17 +151,22 @@ namespace RzWork.AzureMonitor
                     message = string.Format(format, args);
                 }
             }
-            _store.Put(new Event(eventCache.DateTime, eventType, id, source, message));
+            var ts = eventCache?.DateTime ?? DateTime.UtcNow;
+            _store.Put(new Event(ts, eventType, id, source, message));
         }
 
         public override void TraceData(TraceEventCache eventCache, string source, TraceEventType eventType, int id, object data)
         {
-            TraceEvent(eventCache, source, eventType, id, data.ToString(), null);
+            TraceEvent(eventCache, source, eventType, id, data?.ToString(), null);
         }
 
         public override void TraceData(TraceEventCache eventCache, string source, TraceEventType eventType, int id, params object[] data)
         {
-            var message = string.Join(", ", data);
+            string message = null;
+            if (data != null)
+            {
+                message = string.Join(", ", data);
+            }
             TraceEvent(eventCache, source, eventType, id, message, null);
         }
 

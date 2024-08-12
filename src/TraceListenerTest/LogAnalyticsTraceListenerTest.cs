@@ -1,9 +1,25 @@
 using RzWork.AzureMonitor;
+using System.Diagnostics;
 
 namespace TraceListenerTest;
 
 public class LogAnalyticsTraceListenerTest
 {
+    [Fact]
+    public void NullParams()
+    {
+        using var listener = new LogAnalyticsTraceListener();
+        listener.Write(null);
+        listener.WriteLine(null);
+        listener.Fail(null);
+        listener.Fail(null, null);
+        listener.TraceEvent(null, null, TraceEventType.Information, 0);
+        listener.TraceEvent(null, null, TraceEventType.Information, 0, null);
+        listener.TraceEvent(null, null, TraceEventType.Information, 0, null, null);
+        listener.TraceData(null, null, TraceEventType.Information, 0, null);
+        listener.TraceData(null, null, TraceEventType.Information, 0, null, null);
+    }
+
     [Fact]
     public void PassWithoutConfig()
     {
