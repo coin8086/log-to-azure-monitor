@@ -28,7 +28,7 @@ public class EventStoreTest : IDisposable
     }
 
     [Fact]
-    public void NullParams()
+    public void PassNullParams()
     {
         _eventStore.Put(null);
         _eventStore.Flush(true);

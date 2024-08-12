@@ -21,9 +21,22 @@ namespace RzWork.AzureMonitor
         public LogAnalyticsTraceListener()
         {
             //TODO: If not on Azure, then _shouldInit = false
+            //NOTE: No Init() here since Init() requires Attributes, which is empty in CTOR.
         }
 
-        private bool Init()
+        //For test purpose
+        public LogAnalyticsTraceListener(Config config)
+        {
+            //TODO: If not on Azure, then _shouldInit = false
+            if (config == null)
+            {
+                throw new ArgumentNullException(nameof(config));
+            }
+            //NOTE: Init(config) here since Init(config) doesn't requires Attributes, which is empty in CTOR.
+            Init(config);
+        }
+
+        private bool Init(Config config = null)
         {
             if (!_initialzed)
             {
@@ -35,7 +48,10 @@ namespace RzWork.AzureMonitor
                 {
                     if (!_initialzed)
                     {
-                        var config = Config.Get(Attributes);
+                        if (config == null)
+                        {
+                            config = Config.Get(Attributes);
+                        }
                         DebugLog.WriteInfo<LogAnalyticsTraceListener>($"Got config: {config}");
 
                         if (!config.Complete)

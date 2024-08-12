@@ -46,6 +46,16 @@ namespace RzWork.AzureMonitor
         public bool Complete => !string.IsNullOrEmpty(MiClientId) && !string.IsNullOrEmpty(DcrId) &&
             !string.IsNullOrEmpty(DcrStream) && !string.IsNullOrEmpty(DceUrl);
 
+        public Config() { }
+
+        public Config(string miClientId, string dcrId, string dcrStream, string dceUrl)
+        {
+            MiClientId = miClientId;
+            DcrId = dcrId;
+            DcrStream = dcrStream;
+            DceUrl = dceUrl;
+        }
+
         public void Merge(Config one)
         {
             if (string.IsNullOrEmpty(MiClientId))
