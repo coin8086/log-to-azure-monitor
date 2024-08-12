@@ -50,6 +50,11 @@ namespace RzWork.AzureMonitor
             Content = content;
         }
 
+        public override string ToString()
+        {
+            return ToJson();
+        }
+
         //For debug purpose
         public string ToJson()
         {

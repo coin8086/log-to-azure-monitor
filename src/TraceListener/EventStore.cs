@@ -108,7 +108,7 @@ namespace RzWork.AzureMonitor
                 return;
             }
 
-            DebugLog.WriteVerbose<EventStore>("Put event: {0}", evt.ToJson());
+            DebugLog.WriteVerbose<EventStore>("Put event: {0}", evt);
             if (_events.IsAddingCompleted)
             {
                 DebugLog.WriteWarning<EventStore>("Event is put after Close is called!");
