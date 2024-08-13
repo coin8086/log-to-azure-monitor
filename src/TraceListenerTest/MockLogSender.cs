@@ -1,30 +1,35 @@
 ﻿using RzWork.AzureMonitor;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
 
-namespace TraceListenerTest;
-
-internal class MockLogSender : ILogSender
+namespace TraceListenerTest
 {
-    private string? _exception;
-
-    private int _count = 0;
-
-    public int Count => _count;
-
-    public MockLogSender(string? exception = null)
+    internal class MockLogSender : ILogSender
     {
-        _exception = exception;
-    }
+        private string _exception;
 
-    public void Send<T>(IEnumerable<T> logs)
-    {
-        if (!string.IsNullOrEmpty(_exception))
+        private int _count = 0;
+
+        public int Count => _count;
+
+        public MockLogSender(string exception = null)
         {
-            throw new ApplicationException(_exception);
+            _exception = exception;
         }
-        else
+
+        public void Send<T>(IEnumerable<T> logs)
         {
-            var count = logs.Count<T>();
-            Interlocked.Add(ref _count, count);
+            if (!string.IsNullOrEmpty(_exception))
+            {
+                throw new ApplicationException(_exception);
+            }
+            else
+            {
+                var count = logs.Count<T>();
+                Interlocked.Add(ref _count, count);
+            }
         }
     }
 }

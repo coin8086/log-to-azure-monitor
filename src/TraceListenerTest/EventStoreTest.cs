@@ -1,171 +1,177 @@
 ﻿using RzWork.AzureMonitor;
+using System;
 using System.Diagnostics;
+using System.Threading.Tasks;
+using Xunit;
 
-namespace TraceListenerTest;
-
-public class EventStoreTest : IDisposable
+namespace TraceListenerTest
 {
-    private MockLogSender _sender;
-
-    private EventStore _eventStore;
-
-    private Event _evt;
-
-    private const int FlushInterval = 1000;
-
-    private const int FlushThreshold = 10;
-
-    public EventStoreTest()
+    public class EventStoreTest : IDisposable
     {
-        _sender = new MockLogSender();
-        _eventStore = new EventStore(_sender, FlushInterval, FlushThreshold);
-        _evt = new Event(DateTime.UtcNow, TraceEventType.Information, 0, "", "OK");
-    }
+        private MockLogSender _sender;
 
-    public void Dispose()
-    {
-        _eventStore.Dispose();
-    }
+        private EventStore _eventStore;
 
-    [Fact]
-    public void PassNullParams()
-    {
-        _eventStore.Put(null);
-        _eventStore.Flush(true);
-    }
+        private Event _evt;
 
-    [Fact]
-    public async Task LogsAreSentPeriodically()
-    {
-        var count = FlushThreshold - 1;
-        for (var i = 0; i < count; i++)
+        private const int FlushInterval = 1000;
+
+        private const int FlushThreshold = 10;
+
+        public EventStoreTest()
+        {
+            _sender = new MockLogSender();
+            _eventStore = new EventStore(_sender, FlushInterval, FlushThreshold);
+            _evt = new Event(DateTime.UtcNow, TraceEventType.Information, 0, "", "OK");
+        }
+
+        public void Dispose()
+        {
+            _eventStore.Dispose();
+        }
+
+        [Fact]
+        public void PassNullParams()
+        {
+            _eventStore.Put(null);
+            _eventStore.Flush(true);
+        }
+
+        [Fact]
+        public async Task LogsAreSentPeriodically()
+        {
+            var count = FlushThreshold - 1;
+            for (var i = 0; i < count; i++)
+            {
+                _eventStore.Put(_evt);
+            }
+            Assert.Equal(0, _sender.Count);
+
+            await Task.Delay((int)(FlushInterval * 1.1));
+            Assert.Equal(count, _sender.Count);
+        }
+
+        [Fact]
+        public async Task LogsAreSentOnThreshold()
+        {
+            var count = FlushThreshold - 1;
+            for (var i = 0; i < count; i++)
+            {
+                _eventStore.Put(_evt);
+            }
+            Assert.Equal(0, _sender.Count);
+
+            _eventStore.Put(_evt);
+            await Task.Delay(FlushInterval / 2);
+            Assert.Equal(FlushThreshold, _sender.Count);
+        }
+
+        [Fact]
+        public async Task LogsAreSentOnImportantEvent()
         {
             _eventStore.Put(_evt);
+            Assert.Equal(0, _sender.Count);
+
+            var error = new Event(DateTime.UtcNow, TraceEventType.Error, 0, "", "Some error");
+            _eventStore.Put(error);
+
+            await Task.Delay(FlushInterval / 2);
+            Assert.Equal(2, _sender.Count);
         }
-        Assert.Equal(0, _sender.Count);
 
-        await Task.Delay((int)(FlushInterval * 1.1));
-        Assert.Equal(count, _sender.Count);
-    }
-
-    [Fact]
-    public async Task LogsAreSentOnThreshold()
-    {
-        var count = FlushThreshold - 1;
-        for (var i = 0; i < count; i++)
+        [Fact]
+        public async Task MultipleConcurrentPuts()
         {
+            const int n = 10;
+            const int m = FlushThreshold * 10;
+            var tasks = new Task[n];
+            for (var i = 0; i < n; i++)
+            {
+                tasks[i] = Task.Run(() => {
+                    for (var j = 0; j < m; j++)
+                    {
+                        _eventStore.Put(_evt);
+                    }
+                });
+            }
+            await Task.WhenAll(tasks);
+            _eventStore.Flush(true);
+            Assert.Equal(n * m, _sender.Count);
+        }
+
+        [Fact]
+        public void SynchronousFlush()
+        {
+            var count = FlushThreshold / 2;
+            for (var i = 0; i < count; i++)
+            {
+                _eventStore.Put(_evt);
+            }
+            Assert.Equal(0, _sender.Count);
+
+            _eventStore.Flush(true);
+            Assert.Equal(count, _sender.Count);
+        }
+
+        [Fact]
+        public async Task ASynchronousFlush()
+        {
+            var count = FlushThreshold / 2;
+            for (var i = 0; i < count; i++)
+            {
+                _eventStore.Put(_evt);
+            }
+            Assert.Equal(0, _sender.Count);
+
+            _eventStore.Flush(false);
+            Assert.True(_sender.Count < count);
+
+            await Task.Delay(FlushInterval / 2);
+            Assert.Equal(count, _sender.Count);
+        }
+
+        [Fact]
+        public void LogsAreSentOnClose()
+        {
+            var count = FlushThreshold - 1;
+            for (var i = 0; i < count; i++)
+            {
+                _eventStore.Put(_evt);
+            }
+            Assert.Equal(0, _sender.Count);
+
+            _eventStore.Close();
+            Assert.Equal(count, _sender.Count);
+        }
+
+        [Fact]
+        public void CannotPutMoreAfterClose()
+        {
+            var count = FlushThreshold - 1;
+            for (var i = 0; i < count; i++)
+            {
+                _eventStore.Put(_evt);
+            }
+            Assert.Equal(0, _sender.Count);
+
+            _eventStore.Close();
+            Assert.Equal(count, _sender.Count);
+
             _eventStore.Put(_evt);
+            _eventStore.Flush(true);
+            Assert.Equal(count, _sender.Count);
         }
-        Assert.Equal(0, _sender.Count);
 
-        _eventStore.Put(_evt);
-        await Task.Delay(FlushInterval / 2);
-        Assert.Equal(FlushThreshold, _sender.Count);
-    }
-
-    [Fact]
-    public async Task LogsAreSentOnImportantEvent()
-    {
-        _eventStore.Put(_evt);
-        Assert.Equal(0, _sender.Count);
-
-        var error = new Event(DateTime.UtcNow, TraceEventType.Error, 0, "", "Some error");
-        _eventStore.Put(error);
-
-        await Task.Delay(FlushInterval / 2);
-        Assert.Equal(2, _sender.Count);
-    }
-
-    [Fact]
-    public async Task MultipleConcurrentPuts()
-    {
-        const int n = 10;
-        const int m = FlushThreshold * 10;
-        var tasks = new Task[n];
-        for (var i = 0; i < n; i++)
+        [Fact]
+        public void NoExceptionWhenLogSenderThrows()
         {
-            tasks[i] = Task.Run(() => {
-                for (var j = 0; j < m; j++)
-                {
-                    _eventStore.Put(_evt);
-                }
-            });
+            var sender = new MockLogSender("some exception");
+            using (var eventStore = new EventStore(sender, FlushInterval, FlushThreshold))
+            {
+                eventStore.Put(_evt);
+                eventStore.Flush(true);
+            }
+            Assert.Equal(0, sender.Count);
         }
-        await Task.WhenAll(tasks);
-        _eventStore.Flush(true);
-        Assert.Equal(n * m, _sender.Count);
-    }
-
-    [Fact]
-    public void SynchronousFlush()
-    {
-        var count = FlushThreshold / 2;
-        for (var i = 0; i < count; i++)
-        {
-            _eventStore.Put(_evt);
-        }
-        Assert.Equal(0, _sender.Count);
-
-        _eventStore.Flush(true);
-        Assert.Equal(count, _sender.Count);
-    }
-
-    [Fact]
-    public async Task ASynchronousFlush()
-    {
-        var count = FlushThreshold / 2;
-        for (var i = 0; i < count; i++)
-        {
-            _eventStore.Put(_evt);
-        }
-        Assert.Equal(0, _sender.Count);
-
-        _eventStore.Flush(false);
-        Assert.True(_sender.Count < count);
-
-        await Task.Delay(FlushInterval / 2);
-        Assert.Equal(count, _sender.Count);
-    }
-
-    [Fact]
-    public void LogsAreSentOnClose()
-    {
-        var count = FlushThreshold - 1;
-        for (var i = 0; i < count; i++)
-        {
-            _eventStore.Put(_evt);
-        }
-        Assert.Equal(0, _sender.Count);
-
-        _eventStore.Close();
-        Assert.Equal(count, _sender.Count);
-    }
-
-    [Fact]
-    public void CannotPutMoreAfterClose()
-    {
-        var count = FlushThreshold - 1;
-        for (var i = 0; i < count; i++)
-        {
-            _eventStore.Put(_evt);
-        }
-        Assert.Equal(0, _sender.Count);
-
-        _eventStore.Close();
-        Assert.Equal(count, _sender.Count);
-
-        _eventStore.Put(_evt);
-        _eventStore.Flush(true);
-        Assert.Equal(count, _sender.Count);
-    }
-
-    [Fact]
-    public void NoExceptionWhenLogSenderThrows()
-    {
-        var sender = new MockLogSender("some exception");
-        using var eventStore = new EventStore(sender, FlushInterval, FlushThreshold);
-        eventStore.Put(_evt);
-        eventStore.Flush(true);
-        Assert.Equal(0, sender.Count);
     }
 }
