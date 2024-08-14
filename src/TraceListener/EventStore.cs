@@ -25,7 +25,6 @@ namespace RzWork.AzureMonitor
         //TODO: Dispose it?
         private EventWaitHandle _processingEvent = new ManualResetEvent(false);
 
-        //TODO: Dispose it?
         private SystemTimer _flushTimer;
 
         private bool _disposed = false;
@@ -42,7 +41,6 @@ namespace RzWork.AzureMonitor
             _flushTimer = new SystemTimer(_flushInterval);
             _flushTimer.Elapsed += OnFlushTimerFired;
             _flushTimer.Start();
-            //TODO: Dispose the task?
             Task.Run(ProcessEvents).ConfigureAwait(false);
         }
 
@@ -155,12 +153,15 @@ namespace RzWork.AzureMonitor
         public void Close()
         {
             DebugLog.WriteInfo<EventStore>($"Closing...");
-            _flushTimer.Stop();
             if (!_events.IsCompleted)
             {
+                _flushTimer.Stop();
+                _flushTimer.Close();
                 _events.CompleteAdding();
                 Flush(true);
             }
+            //ProcessEvents may be waiting. Let it finish if not yet.
+            _processingEvent.Set();
         }
 
         protected virtual void Dispose(bool disposing)
