@@ -43,6 +43,8 @@ namespace RzWork.AzureMonitor
 
         private static bool _OutToFile = false;
 
+        private static bool _EnableOut = false;
+
         static DebugLog()
         {
             using (var currentProcess = Process.GetCurrentProcess())
@@ -50,6 +52,9 @@ namespace RzWork.AzureMonitor
                 _ProcessName = currentProcess.ProcessName;
                 _ProcessId = currentProcess.Id;
             }
+
+            var outValue = Environment.GetEnvironmentVariable("DebugLog_Out");
+            bool.TryParse(outValue, out _EnableOut);
 
             var verbValue = Environment.GetEnvironmentVariable("DebugLog_Verbose");
             bool.TryParse(verbValue, out _Verbose);
@@ -125,12 +130,15 @@ namespace RzWork.AzureMonitor
 
         private static void WriteOut(LogLevel level, string category, string msg)
         {
-            try
+            if (_EnableOut)
             {
-                _Out.WriteLine($"[{DateTime.UtcNow:yyyy-MM-ddTHH:mm:ss.fffZ}] [{level}] [{_ProcessName}] [{_ProcessId}] [{category}] {msg}");
-                _Out.Flush();
+                try
+                {
+                    _Out.WriteLine($"[{DateTime.UtcNow:yyyy-MM-ddTHH:mm:ss.fffZ}] [{level}] [{_ProcessName}] [{_ProcessId}] [{category}] {msg}");
+                    _Out.Flush();
+                }
+                catch (Exception) { }
             }
-            catch (Exception) { }
         }
 
         private static void WriteEtw(LogLevel level, string category, string msg)
