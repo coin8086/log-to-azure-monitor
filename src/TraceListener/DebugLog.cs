@@ -69,7 +69,7 @@ namespace RzWork.AzureMonitor
             }
             catch (Exception ex)
             {
-                WriteConsole(LogLevel.Warn, typeof(DebugLog).FullName, $"Error when accessing ETW: {ex}");
+                WriteOut(LogLevel.Warn, typeof(DebugLog).FullName, $"Error when accessing ETW: {ex}");
             }
         }
 
@@ -89,7 +89,7 @@ namespace RzWork.AzureMonitor
             {
                 _Out = Console.Error;
                 _OutToFile = false;
-                WriteConsole(LogLevel.Warn, typeof(DebugLog).FullName, $"Error when setting log filename: {ex}");
+                WriteOut(LogLevel.Warn, typeof(DebugLog).FullName, $"Error when setting log filename: {ex}");
             }
         }
 
@@ -119,23 +119,28 @@ namespace RzWork.AzureMonitor
         private static void Write<T>(LogLevel level, string msg)
         {
             var category = typeof(T).FullName;
-            WriteConsole(level, category, msg);
+            WriteOut(level, category, msg);
+            WriteEtw(level, category, msg);
+        }
+
+        private static void WriteOut(LogLevel level, string category, string msg)
+        {
+            try
+            {
+                _Out.WriteLine($"[{DateTime.UtcNow:yyyy-MM-ddTHH:mm:ss.fffZ}] [{level}] [{_ProcessName}] [{_ProcessId}] [{category}] {msg}");
+                _Out.Flush();
+            }
+            catch (Exception) { }
+        }
+
+        private static void WriteEtw(LogLevel level, string category, string msg)
+        {
             try
             {
                 if (EventLog.SourceExists(_EtwSource))
                 {
                     EventLog.WriteEntry(_EtwSource, $"[{_ProcessName}] [{_ProcessId}] [{category}] {msg}", ToEventLogEntryType(level));
                 }
-            }
-            catch (Exception) {}
-        }
-
-        private static void WriteConsole(LogLevel level, string category, string msg)
-        {
-            try
-            {
-                _Out.WriteLine($"[{DateTime.UtcNow:yyyy-MM-ddTHH:mm:ss.fffZ}] [{level}] [{_ProcessName}] [{_ProcessId}] [{category}] {msg}");
-                _Out.Flush();
             }
             catch (Exception) { }
         }
