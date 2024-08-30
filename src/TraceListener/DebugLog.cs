@@ -31,7 +31,9 @@ namespace RzWork.AzureMonitor
 
         private static string _EtwSource = typeof(DebugLog).Namespace;
 
-        private static string _EtwLog = typeof(DebugLog).FullName;
+        //NOTE: Only the first 8 characters of the ETW log name are significant
+        //and the name (first 8 chars) must be unique across all ETW sources.
+        private static string _EtwLog = typeof(DebugLog).Name;
 
         private static bool _Verbose = false;
 
